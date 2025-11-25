@@ -21,7 +21,7 @@ pub enum StringMatcher {
     /// and uses the regex syntax. For example, `^py.*37$` matches any
     /// string starting with `py` and ending with `37`. Note that the regex
     /// is anchored, so it must match the entire string.
-    Regex(regex::Regex),
+    Regex(fancy_regex::Regex),
 }
 
 impl Hash for StringMatcher {
@@ -51,7 +51,7 @@ impl StringMatcher {
         match self {
             StringMatcher::Exact(s) => s == other,
             StringMatcher::Glob(glob) => glob.matches(other),
-            StringMatcher::Regex(regex) => regex.is_match(other),
+            StringMatcher::Regex(regex) => regex.is_match(other).expect("regex failed"),
         }
     }
 }
@@ -79,7 +79,7 @@ impl FromStr for StringMatcher {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if s.starts_with('^') && s.ends_with('$') {
-            Ok(StringMatcher::Regex(regex::Regex::new(s).map_err(
+            Ok(StringMatcher::Regex(fancy_regex::Regex::new(s).map_err(
                 |_err| StringMatcherParseError::InvalidRegex {
                     regex: s.to_string(),
                 },
@@ -148,7 +148,7 @@ mod tests {
             "foo*".parse().unwrap()
         );
         assert_eq!(
-            StringMatcher::Regex(regex::Regex::new("^foo.*$").unwrap()),
+            StringMatcher::Regex(fancy_regex::Regex::new("^foo.*$").unwrap()),
             "^foo.*$".parse().unwrap()
         );
     }

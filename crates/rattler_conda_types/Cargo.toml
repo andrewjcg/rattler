@@ -55,6 +55,7 @@ dirs = { workspace = true }
 rayon = { workspace = true, optional = true }
 fs-err = { workspace = true }
 memmap2 = { workspace = true }
+fancy-regex = "0.11"
 
 [target.'cfg(target_os = "macos")'.dependencies]
 core-foundation = { version = "0.10.0" }
